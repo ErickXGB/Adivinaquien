@@ -1,0 +1,33 @@
+import { Deck } from '../types/game';
+
+export const DEFAULT_CLASSIC_DECK: Deck = {
+  id: 'classic-deck',
+  name: 'Personajes Clásicos',
+  isCustom: false,
+  characters: [
+    { id: 'c1', name: 'Alex', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Alex' },
+    { id: 'c2', name: 'Beatriz', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Beatriz' },
+    { id: 'c3', name: 'Carlos', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Carlos' },
+    { id: 'c4', name: 'Diana', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Diana' },
+    { id: 'c5', name: 'Eduardo', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Eduardo' },
+    { id: 'c6', name: 'Fabiola', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Fabiola' },
+    { id: 'c7', name: 'Gabriel', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Gabriel' },
+    { id: 'c8', name: 'Helena', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Helena' },
+    { id: 'c9', name: 'Ignacio', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ignacio' },
+    { id: 'c10', name: 'Julia', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Julia' },
+    { id: 'c11', name: 'Kevin', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Kevin' },
+    { id: 'c12', name: 'Laura', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Laura' },
+    { id: 'c13', name: 'Manuel', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Manuel' },
+    { id: 'c14', name: 'Natalia', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Natalia' },
+    { id: 'c15', name: 'Oscar', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Oscar' },
+    { id: 'c16', name: 'Paula', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Paula' },
+    { id: 'c17', name: 'Quique', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Quique' },
+    { id: 'c18', name: 'Rosa', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Rosa' },
+    { id: 'c19', name: 'Sergio', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Sergio' },
+    { id: 'c20', name: 'Tania', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Tania' },
+    { id: 'c21', name: 'Ulises', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ulises' },
+    { id: 'c22', name: 'Valeria', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Valeria' },
+    { id: 'c23', name: 'Walter', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Walter' },
+    { id: 'c24', name: 'Ximena', imageUrl: 'https://api.dicebear.com/7.x/bottts/svg?seed=Ximena' },
+  ],
+};

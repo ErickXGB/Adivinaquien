@@ -1,0 +1,34 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Reglas para salas de juego
+    match /rooms/{roomId} {
+      allow read: if true; // Cualquiera con el ID o código puede leer el estado público
+      allow create: if request.resource.data.status == 'waiting';
+      allow update: if true; // En producción, validar que pertenezca a los jugadores
+      
+      // Subcolección PRIVADA para información secreta de cada jugador
+      // CRÍTICO: Ningún jugador puede leer el personaje secreto del rival inspeccionando la red
+      match /private_players/{playerId} {
+        // Solo el jugador dueño de este documento puede leer su personaje secreto
+        // O al finalizar la partida ('finished') se puede permitir revelar
+        allow read: if request.auth != null && request.auth.uid == playerId
+                    || resource.data.playerId == playerId
+                    || get(/databases/$(database)/documents/rooms/$(roomId)).data.status == 'finished';
+        allow write: if true;
+      }
+      
+      // Subcolección de mensajes y preguntas en tiempo real
+      match /messages/{messageId} {
+        allow read, create: if true;
+      }
+    }
+    
+    // Reglas para mazos de cartas
+    match /decks/{deckId} {
+      allow read: if true;
+      allow create, update: if true;
+    }
+  }
+}

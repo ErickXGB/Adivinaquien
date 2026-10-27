@@ -1,0 +1,33 @@
+import { Deck } from '../types/game';
+
+export const harryPotterDeck: Deck = {
+  id: 'harry-potter-deck',
+  name: 'Mundo Mágico de Harry Potter',
+  isCustom: false,
+  characters: [
+    { id: 'hp1', name: 'Harry Potter', imageUrl: 'https://images.ctfassets.net/usf1vwtuqyxm/3SQ3L2xT3e864Y44608y6S/d269528f4410f3c58e5e791b899479b1/HarryPotter_WB_XP_HP1_HarryInHogwartsExpress_Promo.jpg' },
+    { id: 'hp2', name: 'Hermione Granger', imageUrl: 'https://images.ctfassets.net/usf1vwtuqyxm/285E3M31A8ee2Aew2S0Mgi/a823ed3470923e3e012e52e4630a9117/HermioneGranger_WB_XP_HP2_HermioneGrangerInClassroom_Promo.jpg' },
+    { id: 'hp3', name: 'Ron Weasley', imageUrl: 'https://images.ctfassets.net/usf1vwtuqyxm/10S3vO8gIgm2s02iI404w0/f5756ea6d9b433cfb9b1e95cfc37e6d0/RonWeasley_WB_XP_HP2_RonInHall_Promo.jpg' },
+    { id: 'hp4', name: 'Albus Dumbledore', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/7/73/Dumbledore_Profile.jpg' },
+    { id: 'hp5', name: 'Severus Snape', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/a/a3/Severus_Snape.jpg' },
+    { id: 'hp6', name: 'Lord Voldemort', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/6/6e/Voldemort_Headshot_DH1.png' },
+    { id: 'hp7', name: 'Draco Malfoy', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/8/87/Draco_Malfoy_DH.jpg' },
+    { id: 'hp8', name: 'Rubeus Hagrid', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/e/ee/RubeusHagrid.png' },
+    { id: 'hp9', name: 'Sirius Black', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/7/75/Sirius_Black.jpg' },
+    { id: 'hp10', name: 'Minerva McGonagall', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/2/22/MinervaMcGonagall.png' },
+    { id: 'hp11', name: 'Bellatrix Lestrange', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/1/14/BellatrixLestrange.png' },
+    { id: 'hp12', name: 'Neville Longbottom', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/f/f6/Neville_Longbottom.jpg' },
+    { id: 'hp13', name: 'Luna Lovegood', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/0/07/Luna_Lovegood.jpg' },
+    { id: 'hp14', name: 'Ginny Weasley', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/2/29/Ginny_Weasley.jpg' },
+    { id: 'hp15', name: 'Remus Lupin', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/5/53/Remus_Lupin.jpg' },
+    { id: 'hp16', name: 'Dobby', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/d/d7/Dobby_WB_illustration.jpg' },
+    { id: 'hp17', name: 'Fred Weasley', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/9/90/Fred_Weasley.jpg' },
+    { id: 'hp18', name: 'George Weasley', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/2/2a/George_Weasley.jpg' },
+    { id: 'hp19', name: 'Lucius Malfoy', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/b/b4/Lucius_Malfoy.jpg' },
+    { id: 'hp20', name: 'Dolores Umbridge', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/e/e3/Dolores_Umbridge.jpg' },
+    { id: 'hp21', name: 'Cho Chang', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/8/85/Cho_Chang.jpg' },
+    { id: 'hp22', name: 'Cedric Diggory', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/9/91/Cedric_Diggory.jpg' },
+    { id: 'hp23', name: 'Peter Pettigrew', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/2/2f/Peter_Pettigrew.jpg' },
+    { id: 'hp24', name: 'Arthur Weasley', imageUrl: 'https://static.wikia.nocookie.net/harrypotter/images/c/c1/Arthur_Weasley.jpg' },
+  ],
+};
