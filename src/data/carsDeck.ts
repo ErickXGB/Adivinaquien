@@ -1,0 +1,33 @@
+import { Deck } from '../types/game';
+
+export const carsDeck: Deck = {
+  id: 'cars-deck',
+  name: 'Cars (Pixar)',
+  isCustom: false,
+  characters: [
+    { id: 'cr1', name: 'Rayo McQueen', imageUrl: '/characters/cars/cr1.webp' },
+    { id: 'cr2', name: 'Mater', imageUrl: '/characters/cars/cr2.webp' },
+    { id: 'cr3', name: 'Sally Carrera', imageUrl: '/characters/cars/cr3.webp' },
+    { id: 'cr4', name: 'Doc Hudson', imageUrl: '/characters/cars/cr4.webp' },
+    { id: 'cr5', name: 'Ramone', imageUrl: '/characters/cars/cr5.webp' },
+    { id: 'cr6', name: 'Flo', imageUrl: '/characters/cars/cr6.webp' },
+    { id: 'cr7', name: 'Luigi', imageUrl: '/characters/cars/cr7.webp' },
+    { id: 'cr8', name: 'Guido', imageUrl: '/characters/cars/cr8.webp' },
+    { id: 'cr9', name: 'Fillmore', imageUrl: '/characters/cars/cr9.webp' },
+    { id: 'cr10', name: 'Sargento', imageUrl: '/characters/cars/cr10.webp' },
+    { id: 'cr11', name: 'Sheriff', imageUrl: '/characters/cars/cr11.webp' },
+    { id: 'cr12', name: 'Red', imageUrl: '/characters/cars/cr12.webp' },
+    { id: 'cr13', name: 'Mack', imageUrl: '/characters/cars/cr13.webp' },
+    { id: 'cr14', name: 'Chick Hicks', imageUrl: '/characters/cars/cr14.webp' },
+    { id: 'cr15', name: 'El Rey', imageUrl: '/characters/cars/cr15.webp' },
+    { id: 'cr16', name: 'Jackson Storm', imageUrl: '/characters/cars/cr16.webp' },
+    { id: 'cr17', name: 'Cruz Ramirez', imageUrl: '/characters/cars/cr17.webp' },
+    { id: 'cr18', name: 'Smokey', imageUrl: '/characters/cars/cr18.webp' },
+    { id: 'cr19', name: 'Sterling', imageUrl: '/characters/cars/cr19.webp' },
+    { id: 'cr20', name: 'Finn McMissile', imageUrl: '/characters/cars/cr20.webp' },
+    { id: 'cr21', name: 'Holley Shiftwell', imageUrl: '/characters/cars/cr21.webp' },
+    { id: 'cr22', name: 'Francesco Bernoulli', imageUrl: '/characters/cars/cr22.webp' },
+    { id: 'cr23', name: 'Nigel Gearsley', imageUrl: '/characters/cars/cr23.webp' },
+    { id: 'cr24', name: 'Max Schnell', imageUrl: '/characters/cars/cr24.webp' },
+  ],
+};

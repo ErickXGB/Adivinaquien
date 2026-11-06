@@ -1,0 +1,33 @@
+import { Deck } from '../types/game';
+
+export const peanutsDeck: Deck = {
+  id: 'peanuts-deck',
+  name: 'Peanuts (Snoopy y su pandilla)',
+  isCustom: false,
+  characters: [
+    { id: 'pn1', name: 'Charlie Brown', imageUrl: '/characters/peanuts/pn1.webp' },
+    { id: 'pn2', name: 'Snoopy', imageUrl: '/characters/peanuts/pn2.webp' },
+    { id: 'pn3', name: 'Lucy van Pelt', imageUrl: '/characters/peanuts/pn3.webp' },
+    { id: 'pn4', name: 'Linus van Pelt', imageUrl: '/characters/peanuts/pn4.webp' },
+    { id: 'pn5', name: 'Sally Brown', imageUrl: '/characters/peanuts/pn5.webp' },
+    { id: 'pn6', name: 'Woodstock', imageUrl: '/characters/peanuts/pn6.webp' },
+    { id: 'pn7', name: 'Peppermint Patty', imageUrl: '/characters/peanuts/pn7.webp' },
+    { id: 'pn8', name: 'Marcie', imageUrl: '/characters/peanuts/pn8.webp' },
+    { id: 'pn9', name: 'Schroeder', imageUrl: '/characters/peanuts/pn9.webp' },
+    { id: 'pn10', name: 'Pig-Pen', imageUrl: '/characters/peanuts/pn10.webp' },
+    { id: 'pn11', name: 'Franklin', imageUrl: '/characters/peanuts/pn11.webp' },
+    { id: 'pn12', name: 'Rerun van Pelt', imageUrl: '/characters/peanuts/pn12.webp' },
+    { id: 'pn13', name: 'Spike', imageUrl: '/characters/peanuts/pn13.webp' },
+    { id: 'pn14', name: 'Belle', imageUrl: '/characters/peanuts/pn14.webp' },
+    { id: 'pn15', name: 'Olaf', imageUrl: '/characters/peanuts/pn15.webp' },
+    { id: 'pn16', name: 'Andy', imageUrl: '/characters/peanuts/pn16.webp' },
+    { id: 'pn17', name: 'Marbles', imageUrl: '/characters/peanuts/pn17.webp' },
+    { id: 'pn18', name: 'Frieda', imageUrl: '/characters/peanuts/pn18.webp' },
+    { id: 'pn19', name: 'Eudora', imageUrl: '/characters/peanuts/pn19.webp' },
+    { id: 'pn20', name: 'Patty', imageUrl: '/characters/peanuts/pn20.webp' },
+    { id: 'pn21', name: 'Violet Gray', imageUrl: '/characters/peanuts/pn21.webp' },
+    { id: 'pn22', name: 'Shermy', imageUrl: '/characters/peanuts/pn22.webp' },
+    { id: 'pn23', name: 'La Chica Pelirroja', imageUrl: '/characters/peanuts/pn23.webp' },
+    { id: 'pn24', name: 'Joe Cool', imageUrl: '/characters/peanuts/pn24.webp' },
+  ],
+};

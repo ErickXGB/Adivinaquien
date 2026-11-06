@@ -41,6 +41,9 @@ export const createRoom = async (
   let prefix = 'HP';
   if (deckId.includes('superhero')) prefix = 'SH';
   else if (deckId.includes('classic')) prefix = 'CL';
+  else if (deckId.includes('peanuts')) prefix = 'PN';
+  else if (deckId.includes('princess')) prefix = 'DP';
+  else if (deckId.includes('cars')) prefix = 'CR';
 
   const roomCode = generateRoomCode(prefix);
   const hostId = generatePlayerId();

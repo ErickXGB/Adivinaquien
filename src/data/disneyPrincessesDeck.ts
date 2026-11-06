@@ -1,0 +1,33 @@
+import { Deck } from '../types/game';
+
+export const disneyPrincessesDeck: Deck = {
+  id: 'disney-princesses-deck',
+  name: 'Princesas de Disney',
+  isCustom: false,
+  characters: [
+    { id: 'dp1', name: 'Blancanieves', imageUrl: '/characters/disney-princesses/dp1.webp' },
+    { id: 'dp2', name: 'Cenicienta', imageUrl: '/characters/disney-princesses/dp2.webp' },
+    { id: 'dp3', name: 'Aurora', imageUrl: '/characters/disney-princesses/dp3.webp' },
+    { id: 'dp4', name: 'Ariel', imageUrl: '/characters/disney-princesses/dp4.webp' },
+    { id: 'dp5', name: 'Bella', imageUrl: '/characters/disney-princesses/dp5.webp' },
+    { id: 'dp6', name: 'Jasmine', imageUrl: '/characters/disney-princesses/dp6.webp' },
+    { id: 'dp7', name: 'Pocahontas', imageUrl: '/characters/disney-princesses/dp7.webp' },
+    { id: 'dp8', name: 'Mulan', imageUrl: '/characters/disney-princesses/dp8.webp' },
+    { id: 'dp9', name: 'Tiana', imageUrl: '/characters/disney-princesses/dp9.webp' },
+    { id: 'dp10', name: 'Rapunzel', imageUrl: '/characters/disney-princesses/dp10.webp' },
+    { id: 'dp11', name: 'Mérida', imageUrl: '/characters/disney-princesses/dp11.webp' },
+    { id: 'dp12', name: 'Moana', imageUrl: '/characters/disney-princesses/dp12.webp' },
+    { id: 'dp13', name: 'Raya', imageUrl: '/characters/disney-princesses/dp13.webp' },
+    { id: 'dp14', name: 'Anna', imageUrl: '/characters/disney-princesses/dp14.webp' },
+    { id: 'dp15', name: 'Elsa', imageUrl: '/characters/disney-princesses/dp15.webp' },
+    { id: 'dp16', name: 'Mirabel', imageUrl: '/characters/disney-princesses/dp16.webp' },
+    { id: 'dp17', name: 'Isabela', imageUrl: '/characters/disney-princesses/dp17.webp' },
+    { id: 'dp18', name: 'Luisa', imageUrl: '/characters/disney-princesses/dp18.webp' },
+    { id: 'dp19', name: 'Asha', imageUrl: '/characters/disney-princesses/dp19.webp' },
+    { id: 'dp20', name: 'Alicia', imageUrl: '/characters/disney-princesses/dp20.webp' },
+    { id: 'dp21', name: 'Wendy', imageUrl: '/characters/disney-princesses/dp21.webp' },
+    { id: 'dp22', name: 'Campanita', imageUrl: '/characters/disney-princesses/dp22.webp' },
+    { id: 'dp23', name: 'Esmeralda', imageUrl: '/characters/disney-princesses/dp23.webp' },
+    { id: 'dp24', name: 'Vanellope', imageUrl: '/characters/disney-princesses/dp24.webp' },
+  ],
+};
