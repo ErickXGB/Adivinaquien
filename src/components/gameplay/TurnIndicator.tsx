@@ -102,9 +102,15 @@ export const TurnIndicator: React.FC<TurnIndicatorProps> = ({
           {onGuessClick && (
             <button
               onClick={onGuessClick}
-              disabled={disabled || !isMyTurn}
+              disabled={disabled || !isMyTurn || lastMessageType === 'question'}
               className="flex items-center gap-2 rounded-xl border border-amber-500 bg-gradient-to-r from-amber-600 to-amber-700 px-4 py-2 text-xs font-serif font-black text-amber-950 hover:from-amber-400 hover:to-amber-500 hover:text-stone-950 transition-all shadow-lg shadow-amber-600/30 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-              title={isMyTurn ? 'Arriesga adivinar el personaje rival' : 'Solo puedes adivinar en tu turno'}
+              title={
+                !isMyTurn
+                  ? 'Solo puedes adivinar en tu turno'
+                  : lastMessageType === 'question'
+                  ? 'Debes responder la pregunta pendiente antes de adivinar'
+                  : 'Arriesga adivinar el personaje rival'
+              }
             >
               <span>🔮</span>
               <span>¡Adivinar Personaje!</span>

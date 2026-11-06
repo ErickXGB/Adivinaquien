@@ -9,7 +9,7 @@ import { db } from '../config/firebase';
 import { QuickAnswer, GameMessage, RoomDocument, PlayerPrivate } from '../types/game';
 
 /**
- * 1. sendQuestion: Guarda la pregunta en /rooms/{roomId}/messages y conmuta el turno al oponente.
+ * 1. sendQuestion: Guarda la pregunta en /rooms/{roomId}/messages y pasa el turno al oponente para responder.
  */
 export const sendQuestion = async (
   roomId: string,
@@ -23,6 +23,11 @@ export const sendQuestion = async (
   if (!roomSnap.exists()) throw new Error('La sala no existe');
   const roomData = roomSnap.data() as RoomDocument;
 
+  // Validación estricta de turno
+  if (roomData.currentTurnPlayerId && roomData.currentTurnPlayerId !== senderId) {
+    throw new Error('No es tu turno para realizar una pregunta');
+  }
+
   const messagesRef = collection(db, 'rooms', roomId, 'messages');
   const newMsg: Omit<GameMessage, 'id'> = {
     senderId,
@@ -34,7 +39,7 @@ export const sendQuestion = async (
 
   await addDoc(messagesRef, newMsg);
 
-  // Conmutar turno al oponente para que responda
+  // Conmutar turno al oponente para que responda la pregunta
   const opponentId =
     roomData.players.player1?.id === senderId
       ? roomData.players.player2?.id
@@ -49,7 +54,7 @@ export const sendQuestion = async (
 };
 
 /**
- * 2. sendAnswer: Guarda la respuesta rápida y devuelve el turno al preguntante.
+ * 2. sendAnswer: Guarda la respuesta rápida y otorga el turno de interrogar a quien acaba de responder.
  */
 export const sendAnswer = async (
   roomId: string,
@@ -62,6 +67,11 @@ export const sendAnswer = async (
 
   if (!roomSnap.exists()) throw new Error('La sala no existe');
   const roomData = roomSnap.data() as RoomDocument;
+
+  // Validación estricta de turno para responder
+  if (roomData.currentTurnPlayerId && roomData.currentTurnPlayerId !== senderId) {
+    throw new Error('No es tu turno para responder');
+  }
 
   const textMap: Record<QuickAnswer, string> = {
     yes: '¡Sí!',
@@ -81,18 +91,11 @@ export const sendAnswer = async (
 
   await addDoc(messagesRef, newMsg);
 
-  // Devolver el turno al jugador que hizo la pregunta
-  const askerId =
-    roomData.players.player1?.id === senderId
-      ? roomData.players.player2?.id
-      : roomData.players.player1?.id;
-
-  if (askerId) {
-    await updateDoc(roomDocRef, {
-      currentTurnPlayerId: askerId,
-      lastActive: Date.now(),
-    });
-  }
+  // El turno de preguntar ahora le corresponde al jugador que acaba de responder
+  await updateDoc(roomDocRef, {
+    currentTurnPlayerId: senderId,
+    lastActive: Date.now(),
+  });
 };
 
 /**
@@ -134,6 +137,17 @@ export const guessOpponentCharacter = async (
   guessedCharacterId: string,
   guessedCharacterName: string
 ): Promise<{ isWinner: boolean }> => {
+  const roomDocRef = doc(db, 'rooms', roomId);
+  const roomSnap = await getDoc(roomDocRef);
+
+  if (!roomSnap.exists()) throw new Error('La sala no existe');
+  const roomData = roomSnap.data() as RoomDocument;
+
+  // Validación de turno para adivinar
+  if (roomData.currentTurnPlayerId && roomData.currentTurnPlayerId !== guesserId) {
+    throw new Error('Solo puedes adivinar en tu turno');
+  }
+
   const opponentPrivateRef = doc(db, 'rooms', roomId, 'private_players', opponentId);
   const oppSnap = await getDoc(opponentPrivateRef);
 
@@ -145,7 +159,6 @@ export const guessOpponentCharacter = async (
   const isWinner = oppData.secretCharacterId === guessedCharacterId;
 
   const messagesRef = collection(db, 'rooms', roomId, 'messages');
-  const roomDocRef = doc(db, 'rooms', roomId);
 
   if (isWinner) {
     // Victoria

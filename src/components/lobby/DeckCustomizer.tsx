@@ -4,19 +4,27 @@ import { Character } from '../../types/game';
 interface DeckCustomizerProps {
   isOpen: boolean;
   onClose: () => void;
-  onAddCharacter: (character: Character) => void;
+  onReplaceCharacter: (character: Character, replaceId: string) => void;
+  existingCharacters: Character[];
 }
 
 export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
   isOpen,
   onClose,
-  onAddCharacter,
+  onReplaceCharacter,
+  existingCharacters,
 }) => {
   const [name, setName] = useState('');
   const [imageUrl, setImageUrl] = useState('');
   const [error, setError] = useState('');
+  const [selectedReplaceId, setSelectedReplaceId] = useState<string>('');
 
   if (!isOpen) return null;
+
+  // Al abrir, si no hay selección, pre-seleccionar el primero
+  if (!selectedReplaceId && existingCharacters.length > 0) {
+    setSelectedReplaceId(existingCharacters[0].id);
+  }
 
   // Generar URL de avatar temático automático si el usuario no tiene una foto a mano
   const handleGenerateMagicAvatar = () => {
@@ -36,6 +44,10 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
       setError('Por favor ingresa un nombre para el personaje.');
       return;
     }
+    if (!selectedReplaceId) {
+      setError('Selecciona qué personaje deseas reemplazar.');
+      return;
+    }
 
     const finalImage = imageUrl.trim() || `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(trimmedName)}`;
 
@@ -45,9 +57,10 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
       imageUrl: finalImage,
     };
 
-    onAddCharacter(newChar);
+    onReplaceCharacter(newChar, selectedReplaceId);
     setName('');
     setImageUrl('');
+    setSelectedReplaceId('');
     setError('');
     onClose();
   };
@@ -60,13 +73,13 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
         {/* Cabecera */}
         <div className="flex items-center justify-between border-b border-amber-800/40 pb-4">
           <div className="flex items-center gap-2">
-            <span className="text-2xl text-amber-400">✨</span>
+            <span className="text-2xl text-amber-400">🔄</span>
             <div>
               <h2 className="text-base sm:text-lg font-serif font-black uppercase tracking-wider text-amber-200">
-                Nuevo Personaje Personalizado
+                Reemplazar Tarjeta del Tablero
               </h2>
               <p className="text-xs text-stone-400">
-                Añade tus propios magos, brujas o amigos al tablero.
+                Sustituye un personaje para mantener el mismo tamaño de tablero con opciones variadas.
               </p>
             </div>
           </div>
@@ -127,6 +140,45 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
             />
           </div>
 
+          {/* Selector: qué personaje reemplazar */}
+          <div>
+            <label className="block text-xs font-serif font-bold uppercase tracking-wider text-amber-300 mb-2">
+              🔄 Reemplazar a:
+            </label>
+            <p className="text-[11px] text-stone-400 mb-2">
+              Elige qué personaje del tablero será sustituido por el nuevo (también puede ser elegido como personaje secreto).
+            </p>
+            <div className="max-h-36 overflow-y-auto rounded-xl border border-stone-700 bg-stone-900/80 p-2 grid grid-cols-2 gap-1.5">
+              {existingCharacters.map((char) => {
+                const isSelected = char.id === selectedReplaceId;
+                return (
+                  <button
+                    key={char.id}
+                    type="button"
+                    onClick={() => setSelectedReplaceId(char.id)}
+                    className={`flex items-center gap-2 rounded-lg border px-2 py-1.5 text-left transition-all ${
+                      isSelected
+                        ? 'border-amber-400 bg-amber-950/60 text-amber-200'
+                        : 'border-stone-700 bg-stone-800/60 text-stone-300 hover:border-amber-600/60 hover:text-amber-200'
+                    }`}
+                  >
+                    <img
+                      src={char.imageUrl}
+                      alt={char.name}
+                      referrerPolicy="no-referrer"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(char.name)}`;
+                      }}
+                      className="h-7 w-7 rounded-md object-cover object-top border border-stone-700 flex-shrink-0"
+                    />
+                    <span className="text-[11px] font-serif font-bold truncate flex-1">{char.name}</span>
+                    {isSelected && <span className="text-amber-400 text-xs">✓</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Vista previa en tiempo real */}
           <div className="rounded-xl border border-stone-800 bg-stone-900/60 p-3 flex items-center gap-4">
             <div className="relative h-20 w-16 overflow-hidden rounded-lg border border-amber-500/50 bg-stone-950 flex-shrink-0">
@@ -148,7 +200,9 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
                 {name.trim() || 'Nombre del mago'}
               </p>
               <p className="text-[11px] text-stone-400">
-                Se agregará de inmediato a la cuadrícula de juego.
+                Reemplazará a: <span className="text-amber-300 font-bold">
+                  {existingCharacters.find(c => c.id === selectedReplaceId)?.name || '—'}
+                </span>
               </p>
             </div>
           </div>
@@ -164,9 +218,10 @@ export const DeckCustomizer: React.FC<DeckCustomizerProps> = ({
             </button>
             <button
               type="submit"
-              className="rounded-xl border border-amber-600 bg-gradient-to-r from-amber-700 to-amber-900 px-5 py-2 text-xs font-serif font-bold text-amber-100 shadow-md transition-all hover:border-amber-400 hover:text-white active:scale-95"
+              className="rounded-xl border border-amber-600 bg-gradient-to-r from-amber-700 to-amber-900 px-5 py-2 text-xs font-serif font-bold text-amber-100 shadow-md transition-all hover:border-amber-400 hover:text-white active:scale-95 flex items-center gap-1.5"
             >
-              Agregar al Tablero
+              <span>🔄</span>
+              <span>Confirmar Reemplazo</span>
             </button>
           </div>
         </form>

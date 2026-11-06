@@ -13,6 +13,7 @@ import {
   startGame,
   leaveRoom,
   subscribeToAvailableRooms,
+  updateRoomCharacters,
 } from './services/roomService';
 import { sendQuestion, sendAnswer, guessOpponentCharacter } from './services/gameService';
 
@@ -158,16 +159,39 @@ export const App: React.FC = () => {
 
     try {
       if (type === 'question') {
+        // Validación estricta de turno para evitar bombardear preguntas
+        if (room?.currentTurnPlayerId !== myPlayerId) {
+          console.warn('No es tu turno para preguntar');
+          return;
+        }
         await sendQuestion(roomId, myPlayerId, senderName, content);
       } else if (type === 'answer' && quickAnswer) {
         await sendAnswer(roomId, myPlayerId, senderName, quickAnswer);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Error al enviar mensaje:', err);
     }
   };
 
-  // 6. Arriesgar Adivinanza del personaje rival
+  // 6. Reemplazar Personaje manteniendo el tamaño exacto del tablero
+  const handleReplaceCharacter = async (newChar: Character, replaceId: string) => {
+    const updated = characters.map((c) => (c.id === replaceId ? newChar : c));
+    setCharacters(updated);
+
+    if (secretCharacter.id === replaceId) {
+      setSecretCharacter(newChar);
+    }
+
+    if (roomId) {
+      try {
+        await updateRoomCharacters(roomId, updated);
+      } catch (err) {
+        console.error('Error al sincronizar reemplazo en la sala:', err);
+      }
+    }
+  };
+
+  // 7. Arriesgar Adivinanza del personaje rival
   const handleGuessOpponent = async (guessedChar: Character) => {
     if (!roomId || !myPlayerId || !room) return;
 
@@ -251,7 +275,7 @@ export const App: React.FC = () => {
           const rand = characters[Math.floor(Math.random() * characters.length)];
           setSecretCharacter(rand);
         }}
-        onAddCharacter={(newChar) => setCharacters((prev) => [...prev, newChar])}
+        onReplaceCharacter={handleReplaceCharacter}
         onSendMessage={handleSendMessage}
         onGuessOpponent={handleGuessOpponent}
         onLeaveRoom={handleLeaveRoom}

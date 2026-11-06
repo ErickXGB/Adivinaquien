@@ -204,7 +204,22 @@ export const startGame = async (
 };
 
 /**
- * 5. leaveRoom: Permite abandonar la sala y limpiar el estado
+ * 5. updateRoomCharacters: Actualiza los personajes del tablero de la sala en tiempo real
+ */
+export const updateRoomCharacters = async (
+  roomId: string,
+  characters: Character[]
+): Promise<void> => {
+  const roomDocRef = doc(db, 'rooms', roomId);
+  await updateDoc(roomDocRef, {
+    characters,
+    boardSize: characters.length,
+    lastActive: Date.now(),
+  });
+};
+
+/**
+ * 6. leaveRoom: Permite abandonar la sala y limpiar el estado
  */
 export const leaveRoom = async (roomId: string, playerId: string): Promise<void> => {
   try {

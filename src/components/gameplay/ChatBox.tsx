@@ -6,12 +6,20 @@ interface ChatBoxProps {
   messages: GameMessage[];
   onSendMessage: (content: string, type: 'question' | 'answer' | 'guess', quickAnswer?: QuickAnswer) => void;
   currentPlayerName?: string;
+  currentTurnPlayerId?: string | null;
+  myPlayerId?: string | null;
+  opponentName?: string;
+  isGameFinished?: boolean;
 }
 
 export const ChatBox: React.FC<ChatBoxProps> = ({
   messages,
   onSendMessage,
   currentPlayerName = 'Tú',
+  currentTurnPlayerId,
+  myPlayerId,
+  opponentName = 'tu oponente',
+  isGameFinished = false,
 }) => {
   const [inputText, setInputText] = useState('');
   const chatEndRef = useRef<HTMLDivElement>(null);
@@ -21,8 +29,22 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
+  // Lógica de turnos para el chat
+  const isMyTurn = !!myPlayerId && currentTurnPlayerId === myPlayerId;
+  const lastMsg = messages.length > 0 ? messages[messages.length - 1] : null;
+  const isWaitingForAnswer = lastMsg?.type === 'question';
+  const isMyQuestionWaiting = isWaitingForAnswer && lastMsg?.senderId === myPlayerId;
+  const isOpponentQuestionWaiting = isWaitingForAnswer && lastMsg?.senderId !== myPlayerId;
+
+  // Solo se puede preguntar si es mi turno, no ha terminado la partida y no hay una pregunta pendiente
+  const canAsk = !isGameFinished && isMyTurn && !isWaitingForAnswer;
+
+  // Solo se puede responder con Sí/No si es mi turno y hay una pregunta pendiente del rival
+  const canAnswer = !isGameFinished && isMyTurn && isOpponentQuestionWaiting;
+
   const handleSendQuestion = (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canAsk) return;
     const trimmed = inputText.trim();
     if (!trimmed) return;
 
@@ -31,6 +53,7 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
   };
 
   const handleQuickAnswer = (answer: QuickAnswer) => {
+    if (!canAnswer) return;
     const textMap: Record<QuickAnswer, string> = {
       yes: '¡Sí!',
       no: '¡No!',
@@ -39,6 +62,18 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
 
     onSendMessage(textMap[answer], 'answer', answer);
   };
+
+  // Determinar placeholder dinámico
+  let inputPlaceholder = 'Formula tu pregunta (ej: ¿Tiene barba?)...';
+  if (isGameFinished) {
+    inputPlaceholder = 'Partida finalizada.';
+  } else if (isMyQuestionWaiting) {
+    inputPlaceholder = `Esperando respuesta de ${opponentName}...`;
+  } else if (isOpponentQuestionWaiting && isMyTurn) {
+    inputPlaceholder = 'Responde a la pregunta pendiente con los botones de abajo...';
+  } else if (!isMyTurn) {
+    inputPlaceholder = `Turno de ${opponentName}. Espera tu turno...`;
+  }
 
   // Sugerencias rápidas temáticas de Harry Potter
   const suggestions = [
@@ -154,8 +189,9 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
             <button
               key={i}
               type="button"
+              disabled={!canAsk}
               onClick={() => setInputText(sug)}
-              className="rounded-full border border-stone-700/60 bg-stone-900/80 px-3 py-1 text-xs text-stone-200 hover:border-amber-500 hover:text-amber-200 whitespace-nowrap transition-colors"
+              className="rounded-full border border-stone-700/60 bg-stone-900/80 px-3 py-1 text-xs text-stone-200 hover:border-amber-500 hover:text-amber-200 whitespace-nowrap transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               {sug}
             </button>
@@ -164,26 +200,57 @@ export const ChatBox: React.FC<ChatBoxProps> = ({
       </div>
 
       {/* Input para redactar pregunta y Barra de Respuestas Rápidas */}
-      <div className="border-t border-amber-900/40 bg-stone-950/90 p-3.5 space-y-3">
+      <div className="border-t border-amber-900/40 bg-stone-950/90 p-3.5 space-y-2.5">
+        {/* Tira informativa de turno */}
+        <div className="flex items-center justify-between px-1 text-[11px] font-serif">
+          {canAsk ? (
+            <span className="text-amber-300 font-bold flex items-center gap-1.5 animate-pulse">
+              <span>🪄</span>
+              <span>Es tu turno de preguntar. Escribe abajo o elige una idea:</span>
+            </span>
+          ) : canAnswer ? (
+            <span className="text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
+              <span>⚡</span>
+              <span>¡{lastMsg?.senderName || 'Tu rival'} preguntó! Responde abajo con Sí o No:</span>
+            </span>
+          ) : isMyQuestionWaiting ? (
+            <span className="text-stone-400 flex items-center gap-1.5">
+              <span>⏳</span>
+              <span>Pregunta enviada. Esperando respuesta de {opponentName}...</span>
+            </span>
+          ) : isGameFinished ? (
+            <span className="text-amber-400/80 font-bold flex items-center gap-1.5">
+              <span>🏆</span>
+              <span>Partida concluida.</span>
+            </span>
+          ) : (
+            <span className="text-stone-400 flex items-center gap-1.5">
+              <span>⏳</span>
+              <span>Turno de {opponentName}. Espera tu turno para preguntar...</span>
+            </span>
+          )}
+        </div>
+
         <form onSubmit={handleSendQuestion} className="flex gap-2">
           <input
             type="text"
             value={inputText}
+            disabled={!canAsk}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Formula tu pregunta (ej: ¿Tiene barba?)..."
-            className="flex-1 rounded-xl border border-stone-700 bg-stone-900/90 px-3.5 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500"
+            placeholder={inputPlaceholder}
+            className="flex-1 rounded-xl border border-stone-700 bg-stone-900/90 px-3.5 py-2.5 text-sm text-stone-100 placeholder-stone-500 focus:border-amber-500 focus:outline-none focus:ring-1 focus:ring-amber-500 disabled:opacity-50 disabled:bg-stone-950 disabled:cursor-not-allowed"
           />
           <button
             type="submit"
-            disabled={!inputText.trim()}
-            className="rounded-xl border border-amber-600/80 bg-gradient-to-b from-amber-800 to-stone-900 px-5 py-2.5 text-sm font-serif font-bold text-amber-200 shadow-md transition-all hover:border-amber-400 hover:from-amber-700 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed active:scale-95"
+            disabled={!canAsk || !inputText.trim()}
+            className="rounded-xl border border-amber-600/80 bg-gradient-to-b from-amber-800 to-stone-900 px-5 py-2.5 text-sm font-serif font-bold text-amber-200 shadow-md transition-all hover:border-amber-400 hover:from-amber-700 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed active:scale-95"
           >
             Preguntar
           </button>
         </form>
 
         {/* Botones Sí, No, No aplica para responder a la última pregunta */}
-        <QuickAnswerBar onAnswer={handleQuickAnswer} />
+        <QuickAnswerBar onAnswer={handleQuickAnswer} disabled={!canAnswer} />
       </div>
     </div>
   );
