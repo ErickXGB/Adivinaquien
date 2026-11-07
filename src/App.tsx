@@ -14,6 +14,7 @@ import {
   leaveRoom,
   subscribeToAvailableRooms,
   updateRoomCharacters,
+  updatePlayerSecretCharacter,
 } from './services/roomService';
 import { sendQuestion, sendAnswer, guessOpponentCharacter } from './services/gameService';
 
@@ -70,16 +71,29 @@ export const App: React.FC = () => {
   useEffect(() => {
     if (mySecretCharacterId) {
       const found = characters.find((c) => c.id === mySecretCharacterId);
-      if (found) {
+      if (found && found.id !== secretCharacter.id) {
         setSecretCharacter(found);
       }
     }
-  }, [mySecretCharacterId, characters]);
+  }, [mySecretCharacterId, characters, secretCharacter.id]);
 
-  // Si la sala tiene personajes específicos guardados
+  // Si la sala tiene personajes específicos guardados (evitar recrear arrays si no hubo cambios)
   useEffect(() => {
     if (room?.characters && room.characters.length > 0) {
-      setCharacters(room.characters);
+      setCharacters((prev) => {
+        if (
+          prev.length === room.characters.length &&
+          prev.every(
+            (c, i) =>
+              c.id === room.characters[i].id &&
+              c.name === room.characters[i].name &&
+              c.imageUrl === room.characters[i].imageUrl
+          )
+        ) {
+          return prev;
+        }
+        return room.characters;
+      });
     }
   }, [room?.characters]);
 
@@ -94,6 +108,9 @@ export const App: React.FC = () => {
         theme.deck.characters
       );
       setCharacters(theme.deck.characters);
+      if (theme.deck.characters.length > 0) {
+        setSecretCharacter(theme.deck.characters[0]);
+      }
       setRoomId(result.roomId);
       setMyPlayerId(result.playerId);
       sessionStorage.setItem('gw_room_id', result.roomId);
@@ -122,12 +139,16 @@ export const App: React.FC = () => {
     }
   };
 
-  // 3. Iniciar Partida (Host)
+  // 3. Iniciar Partida (Host) - Respetando el personaje secreto elegido
   const handleStartGame = async () => {
     if (!roomId) return;
     setActionLoading(true);
     try {
-      await startGame(roomId);
+      const manualSecrets: { [playerId: string]: string } = {};
+      if (myPlayerId && secretCharacter?.id) {
+        manualSecrets[myPlayerId] = secretCharacter.id;
+      }
+      await startGame(roomId, manualSecrets);
     } finally {
       setActionLoading(false);
     }
@@ -173,13 +194,46 @@ export const App: React.FC = () => {
     }
   };
 
-  // 6. Reemplazar Personaje manteniendo el tamaño exacto del tablero
+  // 6. Selección manual del personaje secreto (sincronizado con Firestore para que nunca se reinicie)
+  const handleSelectSecretCharacter = async (char: Character) => {
+    setSecretCharacter(char);
+    if (roomId && myPlayerId) {
+      try {
+        await updatePlayerSecretCharacter(roomId, myPlayerId, char.id);
+      } catch (err) {
+        console.error('Error al actualizar personaje secreto en Firestore:', err);
+      }
+    }
+  };
+
+  // 7. Selección aleatoria del personaje secreto (sincronizado con Firestore)
+  const handleRandomSecretCharacter = async () => {
+    if (characters.length === 0) return;
+    const rand = characters[Math.floor(Math.random() * characters.length)];
+    setSecretCharacter(rand);
+    if (roomId && myPlayerId) {
+      try {
+        await updatePlayerSecretCharacter(roomId, myPlayerId, rand.id);
+      } catch (err) {
+        console.error('Error al actualizar personaje secreto aleatorio en Firestore:', err);
+      }
+    }
+  };
+
+  // 8. Reemplazar Personaje manteniendo el tamaño exacto del tablero
   const handleReplaceCharacter = async (newChar: Character, replaceId: string) => {
     const updated = characters.map((c) => (c.id === replaceId ? newChar : c));
     setCharacters(updated);
 
     if (secretCharacter.id === replaceId) {
       setSecretCharacter(newChar);
+      if (roomId && myPlayerId) {
+        try {
+          await updatePlayerSecretCharacter(roomId, myPlayerId, newChar.id);
+        } catch (err) {
+          console.error('Error al actualizar personaje secreto tras reemplazo:', err);
+        }
+      }
     }
 
     if (roomId) {
@@ -191,7 +245,7 @@ export const App: React.FC = () => {
     }
   };
 
-  // 7. Arriesgar Adivinanza del personaje rival
+  // 9. Arriesgar Adivinanza del personaje rival
   const handleGuessOpponent = async (guessedChar: Character) => {
     if (!roomId || !myPlayerId || !room) return;
 
@@ -270,11 +324,8 @@ export const App: React.FC = () => {
         room={room}
         myPlayerId={myPlayerId}
         messages={messages}
-        onSelectSecretCharacter={(c) => setSecretCharacter(c)}
-        onRandomSecretCharacter={() => {
-          const rand = characters[Math.floor(Math.random() * characters.length)];
-          setSecretCharacter(rand);
-        }}
+        onSelectSecretCharacter={handleSelectSecretCharacter}
+        onRandomSecretCharacter={handleRandomSecretCharacter}
         onReplaceCharacter={handleReplaceCharacter}
         onSendMessage={handleSendMessage}
         onGuessOpponent={handleGuessOpponent}

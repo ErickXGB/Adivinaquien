@@ -11,7 +11,7 @@ import {
   onSnapshot,
 } from 'firebase/firestore';
 import { db } from '../config/firebase';
-import { RoomDocument, PlayerPublic, Character } from '../types/game';
+import { RoomDocument, PlayerPublic, Character, PlayerPrivate } from '../types/game';
 import { harryPotterDeck } from '../data/harryPotterDeck';
 
 // Generar código único de 6 caracteres (ej: HP-4821)
@@ -75,6 +75,16 @@ export const createRoom = async (
   };
 
   await setDoc(roomRef, newRoom);
+
+  // Inicializar subcolección privada del anfitrión con el personaje secreto inicial
+  const hostPrivateRef = doc(db, 'rooms', roomId, 'private_players', hostId);
+  await setDoc(hostPrivateRef, {
+    playerId: hostId,
+    secretCharacterId: characters[0]?.id || '',
+    boardState: {},
+    updatedAt: Date.now(),
+  });
+
   console.log('⚡ [Firebase] ¡Sala creada con éxito en Firestore!', { roomId, roomCode, host: hostPlayer.name, theme: deckName });
 
   return { roomId, roomCode, playerId: hostId };
@@ -119,6 +129,17 @@ export const joinRoom = async (
     status: 'ready',
     lastActive: Date.now(),
   });
+
+  // Inicializar subcolección privada del segundo jugador
+  const guestPrivateRef = doc(db, 'rooms', roomDocSnap.id, 'private_players', guestId);
+  const guestInitialSecret = roomData.characters?.[1]?.id || roomData.characters?.[0]?.id || '';
+  await setDoc(guestPrivateRef, {
+    playerId: guestId,
+    secretCharacterId: guestInitialSecret,
+    boardState: {},
+    updatedAt: Date.now(),
+  });
+
   console.log('⚡ [Firebase] ¡Segundo jugador unido a la sala!', { roomId: roomDocSnap.id, guest: guestPlayer.name });
 
   return { roomId: roomDocSnap.id, playerId: guestId };
@@ -180,24 +201,34 @@ export const startGame = async (
     return availableChars[idx].id;
   };
 
-  const p1Secret = manualSecretCharacterIds?.[p1.id] || getRandomCharId();
-  const p2Secret = manualSecretCharacterIds?.[p2.id] || getRandomCharId();
-
   const p1PrivateRef = doc(db, 'rooms', roomId, 'private_players', p1.id);
+  const p2PrivateRef = doc(db, 'rooms', roomId, 'private_players', p2.id);
+
+  const [p1Snap, p2Snap] = await Promise.all([
+    getDoc(p1PrivateRef),
+    getDoc(p2PrivateRef),
+  ]);
+
+  const p1ExistingSecret = p1Snap.exists() ? (p1Snap.data() as PlayerPrivate).secretCharacterId : null;
+  const p2ExistingSecret = p2Snap.exists() ? (p2Snap.data() as PlayerPrivate).secretCharacterId : null;
+
+  // Respetar personaje manual elegido por el usuario o personaje ya existente antes de asignar al azar
+  const p1Secret = manualSecretCharacterIds?.[p1.id] || p1ExistingSecret || getRandomCharId();
+  const p2Secret = manualSecretCharacterIds?.[p2.id] || p2ExistingSecret || getRandomCharId();
+
   await setDoc(p1PrivateRef, {
     playerId: p1.id,
     secretCharacterId: p1Secret,
-    boardState: {},
+    boardState: p1Snap.exists() ? ((p1Snap.data() as PlayerPrivate).boardState || {}) : {},
     updatedAt: Date.now(),
-  });
+  }, { merge: true });
 
-  const p2PrivateRef = doc(db, 'rooms', roomId, 'private_players', p2.id);
   await setDoc(p2PrivateRef, {
     playerId: p2.id,
     secretCharacterId: p2Secret,
-    boardState: {},
+    boardState: p2Snap.exists() ? ((p2Snap.data() as PlayerPrivate).boardState || {}) : {},
     updatedAt: Date.now(),
-  });
+  }, { merge: true });
 
   await updateDoc(roomDocRef, {
     status: 'playing',
@@ -207,7 +238,27 @@ export const startGame = async (
 };
 
 /**
- * 5. updateRoomCharacters: Actualiza los personajes del tablero de la sala en tiempo real
+ * 5. updatePlayerSecretCharacter: Actualiza el personaje secreto de un jugador en su subcolección privada
+ */
+export const updatePlayerSecretCharacter = async (
+  roomId: string,
+  playerId: string,
+  secretCharacterId: string
+): Promise<void> => {
+  const privateRef = doc(db, 'rooms', roomId, 'private_players', playerId);
+  await setDoc(
+    privateRef,
+    {
+      playerId,
+      secretCharacterId,
+      updatedAt: Date.now(),
+    },
+    { merge: true }
+  );
+};
+
+/**
+ * 6. updateRoomCharacters: Actualiza los personajes del tablero de la sala en tiempo real
  */
 export const updateRoomCharacters = async (
   roomId: string,
@@ -222,7 +273,7 @@ export const updateRoomCharacters = async (
 };
 
 /**
- * 6. leaveRoom: Permite abandonar la sala y limpiar el estado
+ * 7. leaveRoom: Permite abandonar la sala y limpiar el estado
  */
 export const leaveRoom = async (roomId: string, playerId: string): Promise<void> => {
   try {
